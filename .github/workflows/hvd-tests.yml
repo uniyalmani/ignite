@@ -75,7 +75,7 @@ jobs:
       - name: Run Tests
         shell: bash -l {0}
         run: |
-          bash tests/run_cpu_tests.sh
+            DISABLE_XDIST=1 bash tests/run_cpu_tests.sh
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
