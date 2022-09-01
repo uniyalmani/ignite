@@ -10,7 +10,11 @@ fi
 
 MATCH_TESTS_EXPRESSION=${1:-""}
 
-CUDA_VISIBLE_DEVICES="" pytest --tx 4*popen//python=python --cov ignite --cov-report term-missing --cov-report xml -vvv tests "${skip_distrib_opt[@]}" -k "$MATCH_TESTS_EXPRESSION"
+if [ "${DISABLE_XDIST:-0}" -eq "1" ]; then
+    CUDA_VISIBLE_DEVICES="" pytest --cov ignite --cov-report term-missing --cov-report xml -vvv tests "${skip_distrib_opt[@]}" -k "$MATCH_TESTS_EXPRESSION"
+else
+    CUDA_VISIBLE_DEVICES="" pytest --tx 4*popen//python=python --cov ignite --cov-report term-missing --cov-report xml -vvv tests "${skip_distrib_opt[@]}" -k "$MATCH_TESTS_EXPRESSION"
+fi
 
 # https://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_06_02
 if [ "${SKIP_DISTRIB_TESTS:-0}" -eq "1" ]; then
