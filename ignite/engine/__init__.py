@@ -33,7 +33,7 @@ __all__ = [
 def _prepare_batch(
     batch: Sequence[torch.Tensor], device: Optional[Union[str, torch.device]] = None, non_blocking: bool = False
 ) -> Tuple[Union[torch.Tensor, Sequence, Mapping, str, bytes], ...]:
-    """Prepare batch for training: pass to a device with options."""
+    """Prepare batch for training or evaluation: pass to a device with options."""
     x, y = batch
     return (
         convert_tensor(x, device=device, non_blocking=non_blocking),
@@ -84,7 +84,7 @@ def supervised_training_step(
             trainer = Engine(update_fn)
 
     .. versionadded:: 0.4.5
-    .. versionchanged:: 0.5.0
+    .. versionchanged:: 0.4.7
         Added Gradient Accumulation.
     """
 
@@ -106,7 +106,7 @@ def supervised_training_step(
         loss.backward()
         if engine.state.iteration % gradient_accumulation_steps == 0:
             optimizer.step()
-        return output_transform(x, y, y_pred, loss)
+        return output_transform(x, y, y_pred, loss * gradient_accumulation_steps)
 
     return update
 
@@ -158,7 +158,7 @@ def supervised_training_step_amp(
             trainer = Engine(update_fn)
 
     .. versionadded:: 0.4.5
-    .. versionchanged:: 0.5.0
+    .. versionchanged:: 0.4.7
         Added Gradient Accumulation.
     """
 
@@ -192,7 +192,7 @@ def supervised_training_step_amp(
             loss.backward()
             if engine.state.iteration % gradient_accumulation_steps == 0:
                 optimizer.step()
-        return output_transform(x, y, y_pred, loss)
+        return output_transform(x, y, y_pred, loss * gradient_accumulation_steps)
 
     return update
 
@@ -241,7 +241,7 @@ def supervised_training_step_apex(
             trainer = Engine(update_fn)
 
     .. versionadded:: 0.4.5
-    .. versionchanged:: 0.5.0
+    .. versionchanged:: 0.4.7
         Added Gradient Accumulation.
     """
 
@@ -269,7 +269,7 @@ def supervised_training_step_apex(
             scaled_loss.backward()
         if engine.state.iteration % gradient_accumulation_steps == 0:
             optimizer.step()
-        return output_transform(x, y, y_pred, loss)
+        return output_transform(x, y, y_pred, loss * gradient_accumulation_steps)
 
     return update
 
@@ -318,7 +318,7 @@ def supervised_training_step_tpu(
             trainer = Engine(update_fn)
 
     .. versionadded:: 0.4.5
-    .. versionchanged:: 0.5.0
+    .. versionchanged:: 0.4.7
        Added Gradient Accumulation argument for all supervised training methods.
     """
     try:
@@ -344,7 +344,7 @@ def supervised_training_step_tpu(
         loss.backward()
         if engine.state.iteration % gradient_accumulation_steps == 0:
             xm.optimizer_step(optimizer, barrier=True)
-        return output_transform(x, y, y_pred, loss)
+        return output_transform(x, y, y_pred, loss * gradient_accumulation_steps)
 
     return update
 
@@ -494,7 +494,7 @@ def create_supervised_trainer(
         - Added ``amp_mode`` argument for automatic mixed precision.
         - Added ``scaler`` argument for gradient scaling.
 
-    .. versionchanged:: 0.5.0
+    .. versionchanged:: 0.4.7
         Added Gradient Accumulation argument for all supervised training methods.
     """
 

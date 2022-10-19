@@ -115,15 +115,10 @@ class ClearMLLogger(BaseLogger):
             from clearml import Task
             from clearml.binding.frameworks.tensorflow_bind import WeightsGradientHistHelper
         except ImportError:
-            try:
-                # Backwards-compatibility for legacy Trains SDK
-                from trains import Task
-                from trains.binding.frameworks.tensorflow_bind import WeightsGradientHistHelper
-            except ImportError:
-                raise RuntimeError(
-                    "This contrib module requires clearml to be installed. "
-                    "You may install clearml using: \n pip install clearml \n"
-                )
+            raise RuntimeError(
+                "This contrib module requires clearml to be installed. "
+                "You may install clearml using: \n pip install clearml \n"
+            )
 
         experiment_kwargs = {k: v for k, v in kwargs.items() if k not in ("project_name", "task_name", "task_type")}
 
@@ -299,7 +294,7 @@ class OutputHandler(BaseOutputHandler):
             def global_step_transform(engine, event_name):
                 return engine.state.get_event_attrib_value(event_name)
 
-    ..  versionchanged:: 0.5.0
+    .. versionchanged:: 0.4.7
         accepts an optional list of `state_attributes`
     """
 
@@ -467,7 +462,7 @@ class WeightsScalarHandler(BaseWeightsScalarHandler):
                 log_handler=WeightsScalarHandler(model, whitelist=has_bias_in_name)
             )
 
-    ..  versionchanged:: 0.5.0
+    ..  versionchanged:: 0.4.9
         optional argument `whitelist` added.
     """
 
@@ -559,7 +554,7 @@ class WeightsHistHandler(BaseWeightsHandler):
                 log_handler=WeightsHistHandler(model, whitelist=weight_selector)
             )
 
-    ..  versionchanged:: 0.5.0
+    ..  versionchanged:: 0.4.9
         optional argument `whitelist` added.
     """
 
@@ -656,7 +651,7 @@ class GradsScalarHandler(BaseWeightsScalarHandler):
                 log_handler=GradsScalarHandler(model, whitelist=is_in_fc_layer)
             )
 
-    ..  versionchanged:: 0.5.0
+    ..  versionchanged:: 0.4.9
         optional argument `whitelist` added.
     """
 
@@ -746,7 +741,7 @@ class GradsHistHandler(BaseWeightsHandler):
                 log_handler=GradsHistHandler(model, whitelist=has_shape_2_1)
             )
 
-    ..  versionchanged:: 0.5.0
+    ..  versionchanged:: 0.4.9
             optional argument `whitelist` added.
     """
 
