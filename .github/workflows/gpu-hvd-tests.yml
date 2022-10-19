@@ -58,7 +58,7 @@ jobs:
         shell: bash -l {0}
         # https://pytorch.org/get-started/locally/
         run: |
-          pip install torch torchvision -f https://download.pytorch.org/whl/cu113/torch_stable.html
+          pip install torch torchvision -f https://download.pytorch.org/whl/cu116/torch_stable.html
           nvidia-smi
           python -c "import torch; print('CUDA is available: ', torch.cuda.is_available())"
 
@@ -72,7 +72,7 @@ jobs:
         shell: bash -l {0}
         run: |
           cd $GITHUB_WORKSPACE/horovod && python setup.py sdist
-          conda install -y cmake nccl=2.11 -c conda-forge
+          conda install -y cmake nccl cuda-nvcc -c nvidia
           cd $GITHUB_WORKSPACE/horovod && HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED HOROVOD_WITHOUT_MPI=1 HOROVOD_WITH_PYTORCH=1 pip install -v $(ls $GITHUB_WORKSPACE/horovod/dist/horovod-*.tar.gz) && ldconfig
           horovodrun --check-build
 
