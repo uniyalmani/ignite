@@ -62,18 +62,10 @@ jobs:
           nvidia-smi
           python -c "import torch; print('CUDA is available: ', torch.cuda.is_available())"
 
-      - uses: actions/checkout@v3
-        with:
-          repository: 'horovod/horovod'
-          ref: v0.25.0
-          path: horovod
-
       - name: Install Horovod with NCCL GPU ops
         shell: bash -l {0}
         run: |
-          cd $GITHUB_WORKSPACE/horovod && python setup.py sdist
-          conda install -y cmake nccl cuda-nvcc -c nvidia
-          cd $GITHUB_WORKSPACE/horovod && HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED HOROVOD_WITHOUT_MPI=1 HOROVOD_WITH_PYTORCH=1 pip install -v $(ls $GITHUB_WORKSPACE/horovod/dist/horovod-*.tar.gz) && ldconfig
+          HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_PYTORCH=1 pip install horovod[pytorch] --no-cache-dir
           horovodrun --check-build
 
       - name: Install dependencies
